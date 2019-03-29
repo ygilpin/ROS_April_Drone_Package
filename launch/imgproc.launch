@@ -1,0 +1,60 @@
+<!-- This launch file gives an example of resizing an image and publishing
+     the resized image and configuration to new topics-->
+<launch>
+    <node pkg="apriltags_ros" type="apriltag_detector_node" name="apriltag_dectector" output="screen">
+        <!-- Remap topic required by the node to custom topics -->
+        <remap from="image_rect" to="/resize_img/image" />
+        <remap from="camera_info" to= "/resize_img/camera_info" />
+
+        <!-- Optional: Subscribe to the compressed stream-->
+        <param name="image_transport" type="str" value="raw" />
+
+        <param name="tag_family" type="str" value="36h11" />
+
+        <param name="projected_optics" type="bool" value="true" />
+
+        <!-- Describe the tags -->
+        <rosparam param="tag_descriptions">[
+            {id: 10, size: 0.2, frame_id: cage_tag}]
+        </rosparam>
+    </node>
+
+<!-- Publishes /usb_cam/image_raw and /usb_cam/camera_info -->
+    <node 
+        name="usb_cam"
+        pkg="usb_cam"
+        type="usb_cam_node"
+        output="screen">
+        <param name="video_device" value="/dev/video0" />
+        <param name="image_width" value="640" />
+        <param name="image_height" value="480" />
+        <param name="pixel_format" value="yuyv" />
+        <param name="camera_frame_id" value="usb_cam" />
+        <param name="io_method" value="mmap"/>
+        <param name="autoexposure" value="true"/>
+        <param name="framerate" value="30"/>
+        <param name="sharpness" value="255"/>
+    </node>
+
+    <!-- Publishes to /resize_img/camera_info and /resize_img/image -->
+    <node pkg="nodelet" type="nodelet" name="resize_img" args="standalone image_proc/resize">
+        <!-- Use our own input topics instead of the defaults -->
+        <remap from="image" to="/usb_cam/image_raw"/>
+        <remap from="camera_info" to="/usb_cam/camera_info"/>
+
+        <!-- Reduce the height and width by a factor of 5 -->
+        <param name="scale_height" type="double" value="0.25" />
+        <param name="scale_width" type="double" value="0.25" />
+    </node>
+
+    <!-- Display the original and resized images -->
+    <!---<node pkg="image_view" type="image_view" name="original_viewer">
+        <remap from="image" to="/usb_cam/image_raw"/>
+        <param name="autosize" type="bool" value="true"/>
+    </node> -->
+    <node pkg="image_view" type="image_view" name="resize_img_viewer">
+        <remap from="image" to="resize_img/image"/>
+        <param name="autosize" type="bool" value="true"/>
+    </node>
+
+</launch>
