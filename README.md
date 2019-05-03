@@ -15,4 +15,4 @@ april_drone a is a combination of many other ROS Indigo Packages. It links [usb_
 2) `demo.launch.bak` runs all of the core ros packages and will automatically open up the camera stream using the image view. Running another image view on the /tag_detections_image topic will show the live stream with the detected tags circled.
 3) `highspeed.launch` as the name implies does not open a live view nor does it publish the tag_detections_image topic to save computational power. 
 ## Other branches
-1) The openCV branch has similar work, but with an resized image stream using openCV or img_proc package. The image processing one has a slightly better performance, but the openCV has much more image processing options
+1) The openCV branch has similar work, but with an resized image stream using openCV or img_proc package. The image processing one has a slightly better performance, but the openCV has much more image processing options. The openCV has additional dependencies which are [cv_bridge](http://wiki.ros.org/cv_bridge) and openCV. 
